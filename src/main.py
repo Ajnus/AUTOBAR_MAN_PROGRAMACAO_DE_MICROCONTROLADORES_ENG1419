@@ -3,106 +3,174 @@ from tkinter import messagebox
 from tkinter import ttk
 import ast
 
+tamanho_fonte = 7
+
 
 root = tk.Tk()
 root.title("Auto Barman")
 root.geometry("1080x720")
 root.configure(bg='#333333')
 root.resizable(False, False)
-my_tree = ttk.Treeview(root)
+
 storeName = "AutoBar, man"
+table1 = "DRINKS"
+table2 = "INGREDIENTS"
 
-#img = tk.PhotoImage(file='assets/images/izac.png')
-#tk.Label(root, image=img, bg='white').place(x=341, y=330)
+img = tk.PhotoImage(file='assets/images/izac_resized.png')
 
-frame = tk.Frame(root, width='350', height='1850', bg='#333333')
-frame.place(x=400, y=240)
+frame1 = tk.Frame(root, width='350', height='1850', bg='#333333')
+frame1.place(x=80, y=280)
+my_tree1 = ttk.Treeview(frame1, height=6)
+
+frame2 = tk.Frame(root, width='350', height='1850', bg='#333333')
+frame2.place(x=45, y=510)
+my_tree2 = ttk.Treeview(frame2, height=6)
 
 # Creating widgets
-#title_label = tk.Label(frame, text=storeName, bg='#333333', fg='#00FF41', font=("Inconsolata", 30), bd=2)
+title_label = tk.Label(root, text=storeName, bg='#333333', fg='#00FF41', font=("Inconsolata", 30), bd=2)
+table_title_label1 = tk.Label(root, text=table1, bg='#333333', fg='#00FF41', font=("Inconsolata", 20), bd=2)
+table_title_label2= tk.Label(root, text=table2, bg='#333333', fg='#F803F8', font=("Inconsolata", 20), bd=2)
 
-id_label = tk.Label(root, text="ID", font=("Inconsolata", 15))
-name_label = tk.Label(root, text="Nome", font=("Inconsolata", 15))
-price_label = tk.Label(root, text="Preço", font=("Inconsolata", 15))
-quantity_label = tk.Label(root, text="Composição", font=("Inconsolata", 15))
+id_label1 = tk.Label(frame1, text="Nome", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
+name_label1 = tk.Label(frame1, text="Preço", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
+price_label1 = tk.Label(frame1, text="Ingredientes", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
+quantity_label1 = tk.Label(frame1, text="Quantidades (ml)", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
-entry_id = tk.Entry(root, width=25, bd=5, font=("Inconsolata", 15))
-entry_name = tk.Entry(root, width=25, bd=5, font=("Inconsolata", 15))
-entry_price = tk.Entry(root, width=25, bd=5, font=("Inconsolata", 15))
-entry_quantity = tk.Entry(root, width=25, bd=5, font=("Inconsolata", 15))
+id_label2 = tk.Label(frame2, text="Nome", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
+name_label2 = tk.Label(frame2, text="Volume Disponível (ml)", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
+price_label2 = tk.Label(frame2, text="Data de Validade", font=("Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
-button_enter=tk.Button(
+entry_id1 = tk.Entry(frame1, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+entry_name1 = tk.Entry(frame1, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+entry_price1 = tk.Entry(frame1, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+entry_quantity1= tk.Entry(frame1, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+
+entry_id2 = tk.Entry(frame2, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+entry_name2 = tk.Entry(frame2, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+entry_price2 = tk.Entry(frame2, width=25, bd=5, font=("Inconsolata", tamanho_fonte))
+
+#mock
+quantidades_label = tk.Label(root, text="selecionados: 200 ml de Vodka; 100 ml de Lemon", font=("Inconsolata", tamanho_fonte), bg="#333333", fg="#00FF41")
+
+button_enter1=tk.Button(
     root, text="Inserir", padx=5, pady=5, width=7,bd=3,
-    font=('Inconsolata', 15), bg="#0099FF"
+    font=('Inconsolata', tamanho_fonte), bg="#0099FF"
     )
-button_update=tk.Button(
+button_enter2=tk.Button(
+    root, text="Inserir", padx=5, pady=5, width=7,bd=3,
+    font=('Inconsolata', tamanho_fonte), bg="#0099FF"
+    )
+button_update1=tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7,bd=3,
-    font=('Inconsolata', 15), bg="#FFFF08"
+    font=('Inconsolata', tamanho_fonte), bg="#FFFF08"
     )
-button_delete=tk.Button(
+button_update2=tk.Button(
+    root, text="Alterar", padx=5, pady=5, width=7,bd=3,
+    font=('Inconsolata', tamanho_fonte), bg="#FFFF08"
+    )
+button_delete1=tk.Button(
     root, text="Remover", padx=5, pady=5, width=7,bd=3,
-    font=('Inconsolata', 15), bg="#E62E00"
+    font=('Inconsolata', tamanho_fonte), bg="#E62E00"
     )
+button_delete2=tk.Button(
+    root, text="Remover", padx=5, pady=5, width=7,bd=3,
+    font=('Inconsolata', tamanho_fonte), bg="#E62E00"
+    )
+button_add1=tk.Button(
+    root, text="adicionar", padx=4, pady=3, width=10,bd=3,
+    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41"
+    )
+button_clear1=tk.Button(
+    root, text="limpar tudo", padx=3, pady=3, width=10,bd=3,
+    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900"
+    )
+button_add2=tk.Button(
+    root, text="adicionar", padx=4, pady=3, width=10,bd=3,
+    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41"
+    )
+button_clear2=tk.Button(
+    root, text="limpar tudo", padx=3, pady=3, width=10,bd=3,
+    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900"
+    )
+
 
 
 # Placing widgets on the screen
-#title_label.grid(row=0, column=0, columnspan=8, padx=20, pady=20)
+title_label.place(x=390, y=10)
+table_title_label1.place(x=490, y=244)
+table_title_label2.place(x=445, y=470)
 
-id_label.grid(row=1, column=0, padx=10, pady=10)
-name_label.grid(row=2, column=0, padx=10, pady=10)
-price_label.grid(row=3, column=0, padx=10, pady=10)
-quantity_label.grid(row=4, column=0, padx=10, pady=10)
+tk.Label(root, image=img, bg='white').place(x=440, y=70)
 
-entry_id.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
-entry_name.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
-entry_price.grid(row=3, column=1, columnspan=3, padx=5, pady=5)
-entry_quantity.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
+id_label1.grid(row=0, column=0, padx=1, pady=1)
+name_label1.grid(row=1, column=0, padx=10, pady=10)
+price_label1.grid(row=2, column=0, padx=10, pady=10)
+quantity_label1.grid(row=3, column=0, padx=10, pady=10)
 
-button_enter.grid(row=5, column=1, columnspan=1)
-button_update.grid(row=5, column=2, columnspan=1)
-button_delete.grid(row=5, column=3, columnspan=1)
+id_label2.grid(row=0, column=0, padx=10, pady=10)
+name_label2.grid(row=1, column=0, padx=10, pady=10)
+price_label2.grid(row=2, column=0, padx=10, pady=10)
+
+entry_id1.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
+entry_name1.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
+entry_price1.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
+entry_quantity1.grid(row=3, column=1, columnspan=3, padx=5, pady=5)
+
+entry_id2.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
+entry_name2.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
+entry_price2.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
+
+button_enter1.place(x=386, y=433)
+button_update1.place(x=386+245+30, y=433)
+button_delete1.place(x=386+490+30, y=433)
+
+button_enter2.place(x=386, y=660)
+button_update2.place(x=386+245+30, y=660)
+button_delete2.place(x=386+490+30, y=660)
+
+button_add1.place(x=384-178,y=427)
+button_clear1.place(x=384-79,y=427)
+button_add2.place(x=384-177,y=635)
+button_clear2.place(x=384-78,y=635)
+
+quantidades_label.place(x=80,y=473)
+
 
 style = ttk.Style()
-style.configure("Treeview.Heading", font=('Inconsolata', 15))
+style.configure("Treeview.Heading", font=('Inconsolata', 10))
 
-my_tree['columns']=("ID", "Name", "Price", "Composition")
-my_tree.column("#0", width=0, stretch=False)
-my_tree.column("ID", anchor="w", width=100)
-my_tree.column("Name", anchor="w", width=200)
-my_tree.column("Price", anchor="w", width=150)
-my_tree.column("Composition", anchor="w", width=150)
-my_tree.heading("ID", text = "ID", anchor="w")
-my_tree.heading("Name", text = "Nome", anchor="w")
-my_tree.heading("Price", text = "Preço", anchor="w")
-my_tree.heading("Composition", text = "Composição", anchor="w")
+my_tree1['columns']=("ID", "Name", "Price", "Composition")
+my_tree1.column("#0", width=0, stretch=False)
+my_tree1.column("ID", anchor="w", width=100)
+my_tree1.column("Name", anchor="w", width=150)
+my_tree1.column("Price", anchor="w", width=180)
+my_tree1.column("Composition", anchor="w", width=150)
+my_tree1.heading("ID", text = "ID", anchor="center")
+my_tree1.heading("Name", text = "Nome", anchor="center")
+my_tree1.heading("Price", text = "Preço", anchor="center")
+my_tree1.heading("Composition", text = "Composição", anchor="center")
 
-my_tree.tag_configure('orow', background = "#EEEEEE", font=('Inconsolata', 15))
-my_tree.grid(row=1, column=5, columnspan=4, rowspan=5, padx=10, pady=10)
+my_tree1.tag_configure('orow', background = "#EEEEEE", font=('Inconsolata', tamanho_fonte))
+my_tree1.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
+my_tree2['columns']=("ID", "Name", "Volume", "Data de Validade")
+my_tree2.column("#0", width=0, stretch=False)
+my_tree2.column("ID", anchor="w", width=100)
+my_tree2.column("Name", anchor="w", width=150)
+my_tree2.column("Volume", anchor="w", width=180)
+my_tree2.column("Data de Validade", anchor="w", width=150)
+my_tree2.heading("ID", text = "ID", anchor="center")
+my_tree2.heading("Name", text = "Nome", anchor="center")
+my_tree2.heading("Volume", text = "Volume disponível (ml)", anchor="center")
+my_tree2.heading("Data de Validade", text = "Data de Validade", anchor="center")
 
-
-
-
-
+my_tree2.tag_configure('orow', background = "#EEEEEE", font=('Inconsolata', tamanho_fonte))
+my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
 root.mainloop()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# OLD CODE:
 # def login():
 # username = "bino"
 # password = "cmonboy"
