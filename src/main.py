@@ -94,6 +94,28 @@ button_clear2=tk.Button(
     )
 
 
+# Lista de opções para a combobox
+options = ["Ingrediente 1", "Ingrediente 2", "Ingrediente 3", "Ingrediente 4"]
+
+# Variável para armazenar a opção selecionada
+selected_option = tk.StringVar()
+
+# Criar a combobox
+combo = ttk.Combobox(frame1, textvariable=selected_option, values=options, width=18)
+#combo.pack(pady=10)
+#combo.set("Escolha um ingrediente")  # Valor padrão exibido na combobox
+
+def on_select():
+    print("selecionou")
+
+# Adicionar um evento para quando uma opção é selecionada
+combo.bind("<<ComboboxSelected>>", on_select())
+
+# Label para exibir a opção selecionada
+label_result = tk.Label(root, text="Selecionado: Nenhum", font=("Arial", tamanho_fonte))
+#label_result.pack(pady=10)
+
+
 
 # Placing widgets on the screen
 title_label.place(x=390, y=10)
@@ -113,7 +135,7 @@ price_label2.grid(row=2, column=0, padx=10, pady=10)
 
 entry_id1.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
 entry_name1.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
-entry_price1.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
+combo.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
 entry_quantity1.grid(row=3, column=1, columnspan=3, padx=5, pady=5)
 
 entry_id2.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
