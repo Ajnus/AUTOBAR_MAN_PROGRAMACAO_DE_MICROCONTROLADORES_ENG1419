@@ -147,20 +147,25 @@ def insert_data():
 
 def delete_data():
     # print("removeu?")
-    #if my_tree2.selection():
+    # if my_tree2.selection():
     selected_item = my_tree2.selection()[0]
-    #else:
+    # else:
     #    None
     # print(f"selected item: {selected_item}")
 
-    #if selected_item:
-        # Obtenha o índice da linha selecionada
-        #selected_index = my_tree2.index(selected_item)
-        # Exclua os dados do banco de dados
+    # if selected_item:
+    # Obtenha o índice da linha selecionada
+    # selected_index = my_tree2.index(selected_item)
+    # Exclua os dados do banco de dados
     delete_data = str(my_tree2.item(selected_item)['values'][0])
-        # print(f" actual selected item: {my_tree2.item(selected_item)}")
-        # print(f"delete_data: {delete_data}" )
+    # print(f" actual selected item: {my_tree2.item(selected_item)}")
+    # print(f"delete_data: {delete_data}" )
     delete(delete_data)
+
+    # Remover o item selecionado da Combobox
+    ingredient_name = my_tree2.item(selected_item)['values'][1]
+    options.remove(ingredient_name)
+    combo["values"] = options
 
     for data in my_tree2.get_children():
         # print("pre-delete tree")
@@ -373,8 +378,19 @@ button_clear2 = tk.Button(
 """
 
 
-# Lista de opções para a combobox
-options = ["Ingrediente 1", "Ingrediente 2", "Ingrediente 3", "Ingrediente 4"]
+# Antes de criar a lista options, certifique-se de preencher a tabela my_tree2 com dados
+for data in my_tree2.get_children():
+    my_tree2.delete(data)
+
+# counter = 0  # Initialize a counter variable
+for result in reverse(read()):
+    my_tree2.insert(parent='', index='end', iid=result[0],
+                    text="", values=(result), tag='orow')
+    # counter += 1  # Increment the counter for the next iteration
+
+# Agora, crie a lista de opções para a combobox
+options = [my_tree2.item(item, 'values')[1]
+           for item in my_tree2.get_children()]
 
 # Variável para armazenar a opção selecionada
 selected_option = tk.StringVar()
