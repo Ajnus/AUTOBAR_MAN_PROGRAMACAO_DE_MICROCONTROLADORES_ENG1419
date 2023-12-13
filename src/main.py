@@ -147,17 +147,39 @@ def insert_data():
 
 def delete_data():
     # print("removeu?")
+    #if my_tree2.selection():
     selected_item = my_tree2.selection()[0]
+    #else:
+    #    None
     # print(f"selected item: {selected_item}")
+
+    #if selected_item:
+        # Obtenha o índice da linha selecionada
+        #selected_index = my_tree2.index(selected_item)
+        # Exclua os dados do banco de dados
     delete_data = str(my_tree2.item(selected_item)['values'][0])
-    # print(f" actual selected item: {my_tree2.item(selected_item)}")
-    # print(f"delete_data: {delete_data}" )
+        # print(f" actual selected item: {my_tree2.item(selected_item)}")
+        # print(f"delete_data: {delete_data}" )
     delete(delete_data)
 
     for data in my_tree2.get_children():
         # print("pre-delete tree")
         my_tree2.delete(data)
         # print("pos-delete tree")
+
+    # Selecione automaticamente a próxima linha (se existir)
+    """
+        if selected_index < len(my_tree2.get_children()):
+            next_item = my_tree2.get_children()[selected_index]
+            my_tree2.selection_set(next_item)
+        elif selected_index > 0:
+            # Se não houver uma próxima linha, selecione a linha anterior
+            prev_item = my_tree2.get_children()[selected_index - 1]
+            my_tree2.selection_set(prev_item)
+        # else:
+        # messagebox.showinfo(
+        # "Erro", "Nenhuma linha selecionada para exclusão.")
+        """
 
     # counter2 = 0  # Initialize a counter variable
     for result in reverse(read()):
