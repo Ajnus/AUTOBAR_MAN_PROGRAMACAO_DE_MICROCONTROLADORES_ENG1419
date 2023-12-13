@@ -3,6 +3,9 @@ from tkinter import messagebox
 from tkinter import ttk
 import ast
 import sqlite3
+from datetime import datetime
+from PIL import Image, ImageTk
+from unidecode import unidecode
 
 tamanho_fonte = 7
 
@@ -18,6 +21,8 @@ table1 = "DRINKS"
 table2 = "INGREDIENTS"
 
 img = tk.PhotoImage(file='assets/images/izac_resized.png')
+with Image.open("assets/images/sort.png") as sort:
+    sort_image = ImageTk.PhotoImage(sort)
 
 frame1 = tk.Frame(root, width='350', height='1850', bg='#333333')
 frame1.place(x=80, y=280)
@@ -42,8 +47,8 @@ def insert(id, name, price, composition):
         CREATE TABLE IF NOT EXISTS
         inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)
     """)
-    cursor.execute("INSERT INTO inventory VALUES('"+str(id)+"','" +
-                   str(name)+"', '"+str(price)+"', '"+str(composition)+"')")
+    cursor.execute("INSERT INTO inventory VALUES(?, ?, ?, ?)",
+                   (id, name, price, composition))
     conn.commit()
 
 
@@ -52,7 +57,7 @@ def delete(data):
     cursor = conn.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS
                    inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute("DELETE FROM inventory WHERE itemId ='"+str(data)+"'")
+    cursor.execute("DELETE FROM inventory WHERE itemId = ?", (int(data),))
     conn.commit()
 
 
@@ -61,8 +66,9 @@ def update(id, name, price, composition, idName):
     cursor = conn.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS
                    inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute("UPDATE inventory SET itemId ='"+str(id)+"', itemName='"+str(name) +
-                   "', itemPrice='"+str(price)+"', itemComposition='"+str(composition)+"' WHERE itemId ='"+str(idName)+"'")
+    cursor.execute("UPDATE inventory SET itemId = ?, itemName = ?, itemPrice = ?, itemComposition = ? WHERE itemId = ?",
+                   (int(id), name, price, composition, int(idName)))
+
     conn.commit()
 
 
@@ -120,7 +126,7 @@ def insert_data():
 
     # Generate a new ID for the item
     new_id = max_id + 1
-    insert(str(new_id), str(ingredient_name),
+    insert(new_id, str(ingredient_name),
            str(volume), str(expiration_date))
 
     for data in my_tree2.get_children():
@@ -165,11 +171,11 @@ def delete_data():
 
 
 def update_data():
-    #print(my_tree2.selection())
-    #print(my_tree2.selection()[0])
+    # print(my_tree2.selection())
+    # print(my_tree2.selection()[0])
     selected_item = my_tree2.selection()[0]
-    #print(selected_item)
-    
+    # print(selected_item)
+
     update_name = str(my_tree2.item(selected_item)['values'][0])
     update(update_name, entry_ingredient_name.get(), entry_volume.get(),
            entry_expiration_date.get(), update_name)
@@ -186,6 +192,75 @@ def update_data():
     my_tree2.tag_configure('orow', background="#EEEEEE",
                            font=('Inconsolata', tamanho_fonte))
     my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+
+# Função para criar um ícone de seta
+
+
+"""
+def create_arrow_icon():
+    # Criar uma imagem de seta para indicar a ordenação
+    arrow_icon = Image.new('RGBA', (15, 15), (255, 0, 0, 0))
+    draw = ImageDraw.Draw(arrow_icon)
+    draw.polygon([(0, 0), (7, 15), (15, 0)], fill='black')
+    return ImageTk.PhotoImage(arrow_icon)
+"""
+
+# reordena coluna
+
+
+def sort_treeview_column(tv, col, col_type, reverse):
+    data = [(tv.set(child, col), child) for child in tv.get_children('')]
+
+    # Define uma chave de ordenação personalizada com base no tipo de dados na coluna
+    def key_func(item):
+        print(f"item: {item}")
+        value, _ = item
+        if col_type == 'int':
+            print(f"col_type == 'int'? {col_type}")
+            return int(value)
+        elif col_type == 'float':
+            print(f"col_type == 'float'? {col_type}")
+            return float(value)
+        elif col_type == 'datetime':
+            return datetime.strptime(value, '%d-%m-%Y')
+        elif col_type == 'str':
+            # Remove a acentuação antes de comparar strings
+            return unidecode(value.lower())
+        else:
+            print(f"col_type 'else'? {col_type}")
+            return value
+
+    data.sort(key=lambda x: key_func(x), reverse=reverse)
+
+    for index, item in enumerate(data):
+        tv.move(item[1], '', index)
+
+    tv.heading(col, command=lambda: sort_treeview_column(
+        tv, col, col_type, not reverse))
+
+    """
+    data = [(treeview.set(child, col), child)
+            for child in treeview.get_children('')]
+
+    # Define uma chave de ordenação personalizada com base no tipo de dados na coluna
+    def key_func(item):
+        value, _ = item
+        try:
+            # Tentativa de conversão para número
+            return float(value)
+        except ValueError:
+            try:
+                # Tentativa de conversão para data
+                return datetime.strptime(value, '%d-%m-%Y')
+            except ValueError:
+                # Se falhar, manter como string
+                return value
+
+    data.sort(key=key_func, reverse=reverse)
+
+    for index, (value, child) in enumerate(data):
+        treeview.move(child, '', index)
+"""
 
 
 # Creating widgets
@@ -337,8 +412,8 @@ button_delete2.place(x=386+490+30, y=660)
 
 button_add1.place(x=384-178, y=427)
 button_clear1.place(x=384-79, y=427)
-#button_add2.place(x=384-177, y=635)
-#button_clear2.place(x=384-78, y=635)
+# button_add2.place(x=384-177, y=635)
+# button_clear2.place(x=384-78, y=635)
 
 quantidades_label.place(x=80, y=473)
 
@@ -346,31 +421,51 @@ quantidades_label.place(x=80, y=473)
 style = ttk.Style()
 style.configure("Treeview.Heading", font=('Inconsolata', 10))
 
-my_tree1['columns'] = ("ID", "Name", "Price", "Composition")
+# Criar um ícone de seta
+# arrow_icon = create_arrow_icon()
+
+my_tree1['columns'] = ("ID", "Nome", "Preco", "Composicao")
 my_tree1.column("#0", width=0, stretch=False)
 my_tree1.column("ID", anchor="w", width=100)
-my_tree1.column("Name", anchor="w", width=150)
-my_tree1.column("Price", anchor="w", width=180)
-my_tree1.column("Composition", anchor="w", width=150)
+my_tree1.column("Nome", anchor="w", width=150)
+my_tree1.column("Preco", anchor="w", width=180)
+my_tree1.column("Composicao", anchor="w", width=150)
 my_tree1.heading("ID", text="ID", anchor="center")
-my_tree1.heading("Name", text="Nome", anchor="center")
-my_tree1.heading("Price", text="Preço", anchor="center")
-my_tree1.heading("Composition", text="Composição", anchor="center")
+my_tree1.heading("Nome", text="Nome", anchor="center")
+my_tree1.heading("Preco", text="Preço", anchor="center")
+my_tree1.heading("Composicao", text="Composição", anchor="center")
 
 my_tree1.tag_configure('orow', background="#EEEEEE",
                        font=('Inconsolata', tamanho_fonte))
 my_tree1.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
-my_tree2['columns'] = ("ID", "Name", "Volume", "Data de Validade")
+my_tree2['columns'] = ("ID", "Nome", "Volume", "Data de Validade")
 my_tree2.column("#0", width=0, stretch=False)
 my_tree2.column("ID", anchor="w", width=100)
-my_tree2.column("Name", anchor="w", width=150)
+my_tree2.column("Nome", anchor="w", width=150)
 my_tree2.column("Volume", anchor="w", width=180)
 my_tree2.column("Data de Validade", anchor="w", width=150)
-my_tree2.heading("ID", text="ID", anchor="center")
-my_tree2.heading("Name", text="Nome", anchor="center")
+# my_tree2.heading('#0', text="ID", image = sort_image, anchor="center")
+my_tree2.heading("ID", text="ID", image=sort_image, anchor="center",
+                 command=lambda: sort_treeview_column(my_tree2, '#0', 'ID', False))
+my_tree2.heading("Nome", text="Nome", anchor="center")
 my_tree2.heading("Volume", text="Volume disponível (ml)", anchor="center")
 my_tree2.heading("Data de Validade", text="Data de Validade", anchor="center")
+
+# Configurar cabeçalhos clicáveis
+col_types = {'ID': 'int', 'Nome': 'str',
+             'Volume': 'float', 'Data de Validade': 'datetime'}
+for col in my_tree2['columns']:
+    text = my_tree2.heading(col, "text")
+    my_tree2.heading(col, text=text, command=lambda c=col: sort_treeview_column(
+        my_tree2, c, col_types.get(c, 'str'), False))
+
+"""
+for col in my_tree2['columns']:
+    text = my_tree2.heading(col, "text")
+    my_tree2.heading(
+        col, text=text, command=lambda c=col: sort_treeview_column(my_tree2, c, False))
+"""
 
 # print("1")
 # print(my_tree2.get_children())
