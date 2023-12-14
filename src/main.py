@@ -40,34 +40,58 @@ def reverse(tuples):
     return new_tup
 
 
-def insert(table, id, name, price, composition):
+def insert(table, id, name, attr3, attr4):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    cursor.execute(f"""
-        CREATE TABLE IF NOT EXISTS
-        {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)
-    """)
+
+    if table == "ingredients":
+        column3 = "itemVolume"
+        column4 = "itemExpirationDate"
+    elif table == "drinks":
+        column3 = "itemPrice"
+        column4 = "itemComposition"
+
+        cursor.execute(f"""
+            CREATE TABLE IF NOT EXISTS
+            {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)
+        """)
     cursor.execute(f"INSERT INTO {table} VALUES(?, ?, ?, ?)",
-                   (id, name, price, composition))
+                   (id, name, attr3, attr4))
     conn.commit()
 
 
 def delete(table, data):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
+
+    if table == "ingredients":
+        column3 = "itemVolume"
+        column4 = "itemExpirationDate"
+    elif table == "drinks":
+        column3 = "itemPrice"
+        column4 = "itemComposition"
+
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
+                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
     cursor.execute(f"DELETE FROM {table} WHERE itemId = ?", (int(data),))
     conn.commit()
 
 
-def update(table, id, name, price, composition, idName):
+def update(table, id, name, attr3, attr4, idName):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
+
+    if table == "ingredients":
+        column3 = "itemVolume"
+        column4 = "itemExpirationDate"
+    elif table == "drinks":
+        column3 = "itemPrice"
+        column4 = "itemComposition"
+
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute(f"UPDATE {table} SET itemId = ?, itemName = ?, itemPrice = ?, itemComposition = ? WHERE itemId = ?",
-                   (int(id), name, price, composition, int(idName)))
+                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
+    cursor.execute(f"UPDATE {table} SET itemId = ?, itemName = ?, {column3} = ?, {column4} = ? WHERE itemId = ?",
+                   (int(id), name, attr3, attr4, int(idName)))
 
     conn.commit()
 
@@ -75,9 +99,18 @@ def update(table, id, name, price, composition, idName):
 def read(table):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
+
+    if table == "ingredients":
+        column3 = "itemVolume"
+        column4 = "itemExpirationDate"
+    elif table == "drinks":
+        column3 = "itemPrice"
+        column4 = "itemComposition"
+
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
+                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
     cursor.execute(f"SELECT * FROM {table}")
+
     results = cursor.fetchall()
     # print(results)
     conn.commit()
@@ -90,37 +123,49 @@ def update_combobox(combo, table):
     options = [my_tree2.item(item, 'values')[1]
                for item in my_tree2.get_children()] if table == "ingredients" else [my_tree1.item(item, 'values')[1]
                                                                                     for item in my_tree1.get_children()]
-
     combo["values"] = options
-    #print(f"UPDATE_COMBOBOX, OPTIONS: {options}")
+    # print(f"UPDATE_COMBOBOX, OPTIONS: {options}")
 
 
 def insert_data(table, combo):
     if table == "ingredients":
         tree = my_tree2
+        entrada1 = entry_ingredient_name
+        entrada2 = entry_volume
+        texto_2 = "Volume disponível"
+        entrada3 = entry_expiration_date.get()
+        texto_3 = "Data de Validade"
+        nome_local = "ingrediente"
+
     if table == "drinks":
         tree = my_tree1
+        entrada1 = entry_drink_name
+        entrada2 = entry_price
+        texto_2 = "Preço"
+        entrada3 = composition
+        texto_3 = "Composição"
+        nome_local = "drink"
 
-    # print(str(entry_ingredient_name.get()))
-    if str(entry_ingredient_name.get()) != "":
-        ingredient_name = str(entry_ingredient_name.get())
+    if str(entrada1.get()) != "":
+        var_local1 = str(entrada1.get())
     else:
         messagebox.showinfo(
-            "Erro", "Nome de ingrediente não inserido.\nPor favor tente outra vez.")
+            "Erro", f"Nome de {nome_local} não inserido.\nPor favor tente outra vez.")
         return
-    # print(str(entry_volume.get()))
-    if str(entry_volume.get()) != "":
-        volume = str(entry_volume.get())
+
+    if str(entrada2.get()) != "":
+        var_local2 = str(entrada2.get())
     else:
         messagebox.showinfo(
-            "Erro", "Volume disponível de ingrediente não inserido.\nPor favor tente outra vez.")
+            "Erro", f"{texto_2} de {nome_local} não inserido.\nPor favor tente outra vez.")
         return
-    # print(str(entry_volume.get()))
-    if str(entry_expiration_date.get()) != "":
-        expiration_date = str(entry_expiration_date.get())
+
+    print(f"COMPOSITION: {str(entrada3)}")
+    if str(entrada3) != "":
+        var_local3 = str(entrada3)
     else:
         messagebox.showinfo(
-            "Erro", "Data de Validade de ingrediente não inserida.\nPor favor tente outra vez.")
+            "Erro", f"{texto_3} de {nome_local} não inserida.\nPor favor tente outra vez.")
         return
 
     existing_data = read(f"{table}")
@@ -131,8 +176,8 @@ def insert_data(table, combo):
 
     # Generate a new ID for the item
     new_id = max_id + 1
-    insert(table, new_id, str(ingredient_name),
-           str(volume), str(expiration_date))
+    insert(table, new_id, str(var_local1),
+           str(var_local2), str(var_local3))
 
     for data in tree.get_children():
         # print("insert_data: pre-delete")
@@ -150,19 +195,23 @@ def insert_data(table, combo):
     tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
     # Limpar campos após a inserção de dados
-    entry_ingredient_name.delete(0, 'end')
-    entry_volume.delete(0, 'end')
-    entry_expiration_date.delete(0, 'end')
+    entrada1.delete(0, 'end')
+    entrada2.delete(0, 'end')
 
-    update_combobox(combo, table)
+    if table == "ingredients":
+        entry_expiration_date.delete(0, 'end')
+        update_combobox(combo, table)
+    
+    if table == "drinks":
+        clear_all()
 
 
 def delete_data(table, combo):
     global options
-    update_combobox(combo, table)
-    #print(f"DELETE_DATA: {options}")
+    # print(f"DELETE_DATA: {options}")
     if table == "ingredients":
         tree = my_tree2
+        update_combobox(combo, table)
     if table == "drinks":
         tree = my_tree1
 
@@ -171,17 +220,20 @@ def delete_data(table, combo):
 
         # print("removeu?")
         # if my_tree2.selection():
-        #print(f"PRE-SELECTED ITEM: {tree.selection()[0]}")
+        # print(f"PRE-SELECTED ITEM: {tree.selection()[0]}")
         selected_item = tree.selection()[0]
         # else:
         #    None
 
-        # Remover o item selecionado da Combobox
-        ingredient_name = tree.item(selected_item)['values'][1]
-        #print(f"INGREDIENT NAME: {ingredient_name}")
-        #print(options)
-        options.remove(ingredient_name)
-        combo["values"] = options
+        if table == "ingredients":
+            update_combobox(combo, table)
+            # Remover o item selecionado da Combobox
+            ingredient_name = tree.item(selected_item)['values'][1]
+            # print(f"INGREDIENT NAME: {ingredient_name}")
+            # print(options)
+            global options
+            options.remove(ingredient_name)
+            combo["values"] = options
 
         # if selected_item:
         # Obtenha o índice da linha selecionada
@@ -312,7 +364,13 @@ def sort_treeview_column(tv, col, col_type, reverse):
 """
 
 
+composition = {}
+
+
 def add_composition():
+    print("CHAMOU ADD_COMPOSITION")
+    global composition
+    print("COMPOSIÇÃO: {composition}")
     selected_ingredient = combo.get()
     selected_quantity = entry_quantities.get()
 
@@ -320,6 +378,9 @@ def add_composition():
         current_text = combinacoes_label.cget("text")
         updated_text = f"{current_text} {selected_quantity} ml de {selected_ingredient};"
         combinacoes_label.config(text=updated_text)
+        composition[selected_ingredient] = selected_quantity
+        print("COMPOSIÇÃO: {composition}")
+
     else:
         messagebox.showinfo(
             "Erro", "Nenhum ingrediente ou quantidade selecionado(s).\nPor favor tente outra vez.")
@@ -377,7 +438,7 @@ combinacoes_label = tk.Label(root, text="selecionados:", font=(
 
 button_enter1 = tk.Button(
     root, text="Inserir", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#0099FF"
+    font=('Inconsolata', tamanho_fonte), bg="#0099FF", command=lambda: insert_data("drinks", combo)
 )
 button_enter2 = tk.Button(
     root, text="Inserir", padx=5, pady=5, width=7, bd=3,
@@ -385,7 +446,7 @@ button_enter2 = tk.Button(
 )
 button_update1 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#FFFF08"
+    font=('Inconsolata', tamanho_fonte), bg="#FFFF08", command=lambda: update_data("drinks", combo)
 )
 button_update2 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
@@ -393,7 +454,7 @@ button_update2 = tk.Button(
 )
 button_delete1 = tk.Button(
     root, text="Remover", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#E62E00"
+    font=('Inconsolata', tamanho_fonte), bg="#E62E00", command=lambda: delete_data("drinks", combo)
 )
 button_delete2 = tk.Button(
     root, text="Remover", padx=5, pady=5, width=7, bd=3,
@@ -401,11 +462,11 @@ button_delete2 = tk.Button(
 )
 button_add = tk.Button(
     root, text="adicionar", padx=4, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=lambda: add_composition
+    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=add_composition
 )
 button_clear = tk.Button(
     root, text="limpar tudo", padx=3, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=lambda: clear_all
+    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=clear_all
 
 )
 
@@ -430,17 +491,26 @@ selected_option = tk.StringVar()
 
 # Criar a combobox
 combo = ttk.Combobox(frame1, textvariable=selected_option,
-                     values=options, width=18)
+                     values=options, width=18, state="readonly")
 # combo.pack(pady=10)
 # combo.set("Escolha um ingrediente")  # Valor padrão exibido na combobox
 
 
 def on_select(event=None):
     print("selecionou")
+    combo.set(combo.get())
+
+# TO DO: não Funciona
+def on_focus_out(event=None):
+    print("ON_FOCUS_EVENT")
+    combo.selection_clear()
 
 
 # Adicionar um evento para quando uma opção é selecionada
 combo.bind("<<ComboboxSelected>>", lambda event=None: on_select())
+
+# Adiciona o evento <FocusOut> para deselecionar a combobox ao clicar fora dela
+combo.bind("<FocusOut>", lambda event=None: on_focus_out())
 
 # Label para exibir a opção selecionada
 label_result = tk.Label(root, text="Selecionado: Nenhum",
@@ -501,7 +571,7 @@ my_tree1.column("ID", anchor="w", width=100)
 my_tree1.column("Nome", anchor="w", width=150)
 my_tree1.column("Preco", anchor="w", width=180)
 my_tree1.column("Composicao", anchor="w", width=150)
-my_tree1.heading("ID", text="ID", anchor="center")
+my_tree1.heading("ID", text="ID", image=sort_image, anchor="center")
 my_tree1.heading("Nome", text="Nome", anchor="center")
 my_tree1.heading("Preco", text="Preço", anchor="center")
 my_tree1.heading("Composicao", text="Composição", anchor="center")
