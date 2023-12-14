@@ -446,7 +446,7 @@ button_enter2 = tk.Button(
 )
 button_update1 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#FFFF08", command=lambda: update_data("drinks", combo)
+    font=('Inconsolata', tamanho_fonte), bg="#FFFF08", command=lambda: update_data("drinks")
 )
 button_update2 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
