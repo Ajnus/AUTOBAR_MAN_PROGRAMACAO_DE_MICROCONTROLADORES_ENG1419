@@ -144,6 +144,14 @@ def insert_data():
                            font=('Inconsolata', tamanho_fonte))
     my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
+    # Limpar campos após a inserção de dados
+    entry_ingredient_name.delete(0, 'end')
+    entry_volume.delete(0, 'end')
+    entry_expiration_date.delete(0, 'end')
+
+    # Atualizar a Treeview
+    # update_treeview()
+
 
 def delete_data():
     # print("removeu?")
@@ -220,18 +228,6 @@ def update_data():
                            font=('Inconsolata', tamanho_fonte))
     my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
-# Função para criar um ícone de seta
-
-
-"""
-def create_arrow_icon():
-    # Criar uma imagem de seta para indicar a ordenação
-    arrow_icon = Image.new('RGBA', (15, 15), (255, 0, 0, 0))
-    draw = ImageDraw.Draw(arrow_icon)
-    draw.polygon([(0, 0), (7, 15), (15, 0)], fill='black')
-    return ImageTk.PhotoImage(arrow_icon)
-"""
-
 # reordena coluna
 
 
@@ -290,6 +286,25 @@ def sort_treeview_column(tv, col, col_type, reverse):
 """
 
 
+def add_composition():
+    selected_ingredient = combo.get()
+    selected_quantity = entry_quantities.get()
+
+    if selected_ingredient and selected_quantity:
+        current_text = combinacoes_label.cget("text")
+        updated_text = f"{current_text} {selected_quantity} ml de {selected_ingredient};"
+        combinacoes_label.config(text=updated_text)
+    else:
+        messagebox.showinfo(
+            "Erro", "Nenhum ingrediente ou quantidade selecionado(s).\nPor favor tente outra vez.")
+
+
+def clear_all():
+    combo.set("")
+    entry_quantities.delete(0, 'end')
+    combinacoes_label.config(text="Selecionados:")
+
+
 # Creating widgets
 title_label = tk.Label(root, text=storeName, bg='#333333',
                        fg='#00FF41', font=("Inconsolata", 30), bd=2)
@@ -300,18 +315,18 @@ table_title_label2 = tk.Label(
 
 drink_name_label = tk.Label(frame1, text="Nome", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
-price_label1 = tk.Label(frame1, text="Preço", font=(
+price_label = tk.Label(frame1, text="Preço", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
-ingredients_label1 = tk.Label(frame1, text="Ingredientes", font=(
+ingredients_label = tk.Label(frame1, text="Ingredientes", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
-quantities_label1 = tk.Label(frame1, text="Quantidades (ml)", font=(
+quantities_label = tk.Label(frame1, text="Quantidades (ml)", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
 id_label = tk.Label(frame2, text="Nome", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 ingredient_name_label = tk.Label(frame2, text="Volume Disponível (ml)", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
-price_label2 = tk.Label(frame2, text="Data de Validade", font=(
+expiration_date_label = tk.Label(frame2, text="Data de Validade", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
 entry_drink_name = tk.Entry(frame1, width=25, bd=5,
@@ -331,7 +346,7 @@ entry_expiration_date = tk.Entry(frame2, width=25, bd=5,
                                  font=("Inconsolata", tamanho_fonte))
 
 # mock
-quantidades_label = tk.Label(root, text="selecionados: 200 ml de Vodka; 100 ml de Lemon", font=(
+combinacoes_label = tk.Label(root, text="selecionados:", font=(
     "Inconsolata", tamanho_fonte), bg="#333333", fg="#00FF41")
 
 button_enter1 = tk.Button(
@@ -358,24 +373,15 @@ button_delete2 = tk.Button(
     root, text="Remover", padx=5, pady=5, width=7, bd=3,
     font=('Inconsolata', tamanho_fonte), bg="#E62E00", command=delete_data
 )
-button_add1 = tk.Button(
+button_add = tk.Button(
     root, text="adicionar", padx=4, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41"
+    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=add_composition
 )
-button_clear1 = tk.Button(
+button_clear = tk.Button(
     root, text="limpar tudo", padx=3, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900"
+    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=clear_all
+
 )
-"""
-button_add2 = tk.Button(
-    root, text="adicionar", padx=4, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41"
-)
-button_clear2 = tk.Button(
-    root, text="limpar tudo", padx=3, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900"
-)
-"""
 
 
 # Antes de criar a lista options, certifique-se de preencher a tabela my_tree2 com dados
@@ -423,13 +429,13 @@ table_title_label2.place(x=445, y=470)
 tk.Label(root, image=img, bg='white').place(x=440, y=70)
 
 drink_name_label.grid(row=0, column=0, padx=1, pady=1)
-price_label1.grid(row=1, column=0, padx=10, pady=10)
-ingredients_label1.grid(row=2, column=0, padx=10, pady=10)
-quantities_label1.grid(row=3, column=0, padx=10, pady=10)
+price_label.grid(row=1, column=0, padx=10, pady=10)
+ingredients_label.grid(row=2, column=0, padx=10, pady=10)
+quantities_label.grid(row=3, column=0, padx=10, pady=10)
 
 id_label.grid(row=0, column=0, padx=10, pady=10)
 ingredient_name_label.grid(row=1, column=0, padx=10, pady=10)
-price_label2.grid(row=2, column=0, padx=10, pady=10)
+expiration_date_label.grid(row=2, column=0, padx=10, pady=10)
 
 entry_drink_name.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
 entry_price.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
@@ -448,12 +454,12 @@ button_enter2.place(x=386, y=660)
 button_update2.place(x=386+245+30, y=660)
 button_delete2.place(x=386+490+30, y=660)
 
-button_add1.place(x=384-178, y=427)
-button_clear1.place(x=384-79, y=427)
+button_add.place(x=384-178, y=427)
+button_clear.place(x=384-79, y=427)
 # button_add2.place(x=384-177, y=635)
 # button_clear2.place(x=384-78, y=635)
 
-quantidades_label.place(x=80, y=473)
+combinacoes_label.place(x=80, y=473)
 
 
 style = ttk.Style()
