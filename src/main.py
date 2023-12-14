@@ -32,93 +32,98 @@ frame2 = tk.Frame(root, width='350', height='1850', bg='#333333')
 frame2.place(x=45, y=510)
 my_tree2 = ttk.Treeview(frame2, height=6)
 
-# INSERÇÃO DE DADOS
 
+# INSERÇÃO DE DADOS
 
 def reverse(tuples):
     new_tup = tuples[::-1]
     return new_tup
 
 
-def insert(id, name, price, composition):
+def insert(table, id, name, price, composition):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS
-        inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)
+        {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)
     """)
-    cursor.execute("INSERT INTO inventory VALUES(?, ?, ?, ?)",
+    cursor.execute(f"INSERT INTO {table} VALUES(?, ?, ?, ?)",
                    (id, name, price, composition))
     conn.commit()
 
 
-def delete(data):
+def delete(table, data):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS
-                   inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute("DELETE FROM inventory WHERE itemId = ?", (int(data),))
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS
+                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
+    cursor.execute(f"DELETE FROM {table} WHERE itemId = ?", (int(data),))
     conn.commit()
 
 
-def update(id, name, price, composition, idName):
+def update(table, id, name, price, composition, idName):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS
-                   inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute("UPDATE inventory SET itemId = ?, itemName = ?, itemPrice = ?, itemComposition = ? WHERE itemId = ?",
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS
+                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
+    cursor.execute(f"UPDATE {table} SET itemId = ?, itemName = ?, itemPrice = ?, itemComposition = ? WHERE itemId = ?",
                    (int(id), name, price, composition, int(idName)))
 
     conn.commit()
 
 
-def read():
+def read(table):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS
-                   inventory(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
-    cursor.execute("SELECT * FROM inventory")
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS
+                   {table}(itemId TEXT, itemName TEXT, itemPrice TEXT, itemComposition TEXT)""")
+    cursor.execute(f"SELECT * FROM {table}")
     results = cursor.fetchall()
     # print(results)
     conn.commit()
     return results
 
 
-def insert_data():
-    """
-    if entry_drink_name != "":
-        itemName = str(entry_drink_name.get())
-    else:
-        print("Error inserting ingredient name")
-    if entry_price != "":
-        itemName = str(entry_price.get())
-    else:
-        print("Error inserting ingredient name")
-    if entry_ingredients != "":
-        itemName = str(entry_ingredients.get())
-    else:
-        print("Error inserting ingredient name")
-    if entry_quantities != "":
-        itemName = str(entry_drink_name.get())
-    else:
-        print("Error inserting ingredient name")
-    """
-    # if entry_ingredient_name != "":
-    # entry__ingridient_id = str(entry__ingridient_id.get())
-    if entry_ingredient_name != "":
+def update_combobox(combo, table):
+    # Atualizar a lista de opções para a combobox
+    global options
+    options = [my_tree2.item(item, 'values')[1]
+               for item in my_tree2.get_children()] if table == "ingredients" else [my_tree1.item(item, 'values')[1]
+                                                                                    for item in my_tree1.get_children()]
+
+    combo["values"] = options
+    #print(f"UPDATE_COMBOBOX, OPTIONS: {options}")
+
+
+def insert_data(table, combo):
+    if table == "ingredients":
+        tree = my_tree2
+    if table == "drinks":
+        tree = my_tree1
+
+    # print(str(entry_ingredient_name.get()))
+    if str(entry_ingredient_name.get()) != "":
         ingredient_name = str(entry_ingredient_name.get())
     else:
-        print("Error inserting ingredient name")
-    if entry_volume != "":
+        messagebox.showinfo(
+            "Erro", "Nome de ingrediente não inserido.\nPor favor tente outra vez.")
+        return
+    # print(str(entry_volume.get()))
+    if str(entry_volume.get()) != "":
         volume = str(entry_volume.get())
     else:
-        print("Error inserting ingredient volume")
-    if entry_expiration_date != "":
+        messagebox.showinfo(
+            "Erro", "Volume disponível de ingrediente não inserido.\nPor favor tente outra vez.")
+        return
+    # print(str(entry_volume.get()))
+    if str(entry_expiration_date.get()) != "":
         expiration_date = str(entry_expiration_date.get())
     else:
-        print("Error inserting ingredient expiration date")
+        messagebox.showinfo(
+            "Erro", "Data de Validade de ingrediente não inserida.\nPor favor tente outra vez.")
+        return
 
-    existing_data = read()
+    existing_data = read(f"{table}")
     if existing_data:
         max_id = max(int(item[0]) for item in existing_data)
     else:
@@ -126,107 +131,128 @@ def insert_data():
 
     # Generate a new ID for the item
     new_id = max_id + 1
-    insert(new_id, str(ingredient_name),
+    insert(table, new_id, str(ingredient_name),
            str(volume), str(expiration_date))
 
-    for data in my_tree2.get_children():
+    for data in tree.get_children():
         # print("insert_data: pre-delete")
-        my_tree2.delete(data)
+        tree.delete(data)
         # print("insert_data: pos-delete")
 
     # counter2 = 0  # Initialize a counter variable
-    for result in reverse(read()):
-        my_tree2.insert(parent='', index='end', iid=result[0],
-                        text="", values=(result), tag='orow')
+    for result in reverse(read(f"{table}")):
+        tree.insert(parent='', index='end', iid=result[0],
+                    text="", values=(result), tag='orow')
         # counter2 += 1  # Increment the counter for the next iteration
 
-    my_tree2.tag_configure('orow', background="#EEEEEE",
-                           font=('Inconsolata', tamanho_fonte))
-    my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+    tree.tag_configure('orow', background="#EEEEEE",
+                       font=('Inconsolata', tamanho_fonte))
+    tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
     # Limpar campos após a inserção de dados
     entry_ingredient_name.delete(0, 'end')
     entry_volume.delete(0, 'end')
     entry_expiration_date.delete(0, 'end')
 
-    # Atualizar a Treeview
-    # update_treeview()
+    update_combobox(combo, table)
 
 
-def delete_data():
-    # print("removeu?")
-    # if my_tree2.selection():
-    selected_item = my_tree2.selection()[0]
-    # else:
-    #    None
-    # print(f"selected item: {selected_item}")
+def delete_data(table, combo):
+    global options
+    update_combobox(combo, table)
+    #print(f"DELETE_DATA: {options}")
+    if table == "ingredients":
+        tree = my_tree2
+    if table == "drinks":
+        tree = my_tree1
 
-    # if selected_item:
-    # Obtenha o índice da linha selecionada
-    # selected_index = my_tree2.index(selected_item)
-    # Exclua os dados do banco de dados
-    delete_data = str(my_tree2.item(selected_item)['values'][0])
-    # print(f" actual selected item: {my_tree2.item(selected_item)}")
-    # print(f"delete_data: {delete_data}" )
-    delete(delete_data)
+    if tree.selection():
+        # print(tree)
 
-    # Remover o item selecionado da Combobox
-    ingredient_name = my_tree2.item(selected_item)['values'][1]
-    options.remove(ingredient_name)
-    combo["values"] = options
-
-    for data in my_tree2.get_children():
-        # print("pre-delete tree")
-        my_tree2.delete(data)
-        # print("pos-delete tree")
-
-    # Selecione automaticamente a próxima linha (se existir)
-    """
-        if selected_index < len(my_tree2.get_children()):
-            next_item = my_tree2.get_children()[selected_index]
-            my_tree2.selection_set(next_item)
-        elif selected_index > 0:
-            # Se não houver uma próxima linha, selecione a linha anterior
-            prev_item = my_tree2.get_children()[selected_index - 1]
-            my_tree2.selection_set(prev_item)
+        # print("removeu?")
+        # if my_tree2.selection():
+        #print(f"PRE-SELECTED ITEM: {tree.selection()[0]}")
+        selected_item = tree.selection()[0]
         # else:
-        # messagebox.showinfo(
-        # "Erro", "Nenhuma linha selecionada para exclusão.")
+        #    None
+
+        # Remover o item selecionado da Combobox
+        ingredient_name = tree.item(selected_item)['values'][1]
+        #print(f"INGREDIENT NAME: {ingredient_name}")
+        #print(options)
+        options.remove(ingredient_name)
+        combo["values"] = options
+
+        # if selected_item:
+        # Obtenha o índice da linha selecionada
+        # selected_index = tree.index(selected_item)
+        # Exclua os dados do banco de dados
+        delete_data = str(tree.item(selected_item)['values'][0])
+        # print(f" actual selected item: {tree.item(selected_item)}")
+        # print(f"delete_data: {delete_data}" )
+        delete(table, delete_data)
+
+        for data in tree.get_children():
+            # print("pre-delete tree")
+            tree.delete(data)
+            # print("pos-delete tree")
+
+        # Selecione automaticamente a próxima linha (se existir)
         """
+            if selected_index < len(tree.get_children()):
+                next_item = tree.get_children()[selected_index]
+                tree.selection_set(next_item)
+            elif selected_index > 0:
+                # Se não houver uma próxima linha, selecione a linha anterior
+                prev_item = tree.get_children()[selected_index - 1]
+                tree.selection_set(prev_item)
+            # else:
+            # messagebox.showinfo(
+            # "Erro", "Nenhuma linha selecionada para exclusão.")
+            """
 
-    # counter2 = 0  # Initialize a counter variable
-    for result in reverse(read()):
-        my_tree2.insert(parent='', index='end', iid=result[0],
+        # counter2 = 0  # Initialize a counter variable
+        for result in reverse(read(f"{table}")):
+            tree.insert(parent='', index='end', iid=result[0],
                         text="", values=(result), tag='orow')
-        # counter2 += 1  # Increment the counter for the next iteration
+            # counter2 += 1  # Increment the counter for the next iteration
 
-    my_tree2.tag_configure('orow', background="#EEEEEE",
+        tree.tag_configure('orow', background="#EEEEEE",
                            font=('Inconsolata', tamanho_fonte))
-    my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+        tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+
+    else:
+        messagebox.showinfo(
+            "Erro", "Nenhum ingrediente selecionado.\nPor favor tente outra vez.")
 
 
-def update_data():
-    # print(my_tree2.selection())
-    # print(my_tree2.selection()[0])
-    selected_item = my_tree2.selection()[0]
+def update_data(table):
+    if table == "ingredients":
+        tree = my_tree2
+    if table == "drinks":
+        tree = my_tree1
+
+    # print(tree.selection())
+    # print(tree.selection()[0])
+    selected_item = tree.selection()[0]
     # print(selected_item)
 
-    update_name = str(my_tree2.item(selected_item)['values'][0])
-    update(update_name, entry_ingredient_name.get(), entry_volume.get(),
+    update_name = str(tree.item(selected_item)['values'][0])
+    update(table, update_name, entry_ingredient_name.get(), entry_volume.get(),
            entry_expiration_date.get(), update_name)
 
-    for data in my_tree2.get_children():
-        my_tree2.delete(data)
+    for data in tree.get_children():
+        tree.delete(data)
 
     # counter2 = 0  # Initialize a counter variable
-    for result in reverse(read()):
-        my_tree2.insert(parent='', index='end', iid=result[0],
-                        text="", values=(result), tag='orow')
+    for result in reverse(read(f"{table}")):
+        tree.insert(parent='', index='end', iid=result[0],
+                    text="", values=(result), tag='orow')
         # counter2 += 1  # Increment the counter for the next iteration
 
-    my_tree2.tag_configure('orow', background="#EEEEEE",
-                           font=('Inconsolata', tamanho_fonte))
-    my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+    tree.tag_configure('orow', background="#EEEEEE",
+                       font=('Inconsolata', tamanho_fonte))
+    tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
 # reordena coluna
 
@@ -236,13 +262,13 @@ def sort_treeview_column(tv, col, col_type, reverse):
 
     # Define uma chave de ordenação personalizada com base no tipo de dados na coluna
     def key_func(item):
-        print(f"item: {item}")
+        # print(f"item: {item}")
         value, _ = item
         if col_type == 'int':
-            print(f"col_type == 'int'? {col_type}")
+            # print(f"col_type == 'int'? {col_type}")
             return int(value)
         elif col_type == 'float':
-            print(f"col_type == 'float'? {col_type}")
+            # print(f"col_type == 'float'? {col_type}")
             return float(value)
         elif col_type == 'datetime':
             return datetime.strptime(value, '%d-%m-%Y')
@@ -250,7 +276,7 @@ def sort_treeview_column(tv, col, col_type, reverse):
             # Remove a acentuação antes de comparar strings
             return unidecode(value.lower())
         else:
-            print(f"col_type 'else'? {col_type}")
+            # print(f"col_type 'else'? {col_type}")
             return value
 
     data.sort(key=lambda x: key_func(x), reverse=reverse)
@@ -355,7 +381,7 @@ button_enter1 = tk.Button(
 )
 button_enter2 = tk.Button(
     root, text="Inserir", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#0099FF", command=insert_data
+    font=('Inconsolata', tamanho_fonte), bg="#0099FF", command=lambda: insert_data("ingredients", combo)
 )
 button_update1 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
@@ -363,7 +389,7 @@ button_update1 = tk.Button(
 )
 button_update2 = tk.Button(
     root, text="Alterar", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#FFFF08", command=update_data
+    font=('Inconsolata', tamanho_fonte), bg="#FFFF08", command=lambda: update_data("ingredients")
 )
 button_delete1 = tk.Button(
     root, text="Remover", padx=5, pady=5, width=7, bd=3,
@@ -371,15 +397,15 @@ button_delete1 = tk.Button(
 )
 button_delete2 = tk.Button(
     root, text="Remover", padx=5, pady=5, width=7, bd=3,
-    font=('Inconsolata', tamanho_fonte), bg="#E62E00", command=delete_data
+    font=('Inconsolata', tamanho_fonte), bg="#E62E00", command=lambda: delete_data("ingredients", combo)
 )
 button_add = tk.Button(
     root, text="adicionar", padx=4, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=add_composition
+    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=lambda: add_composition
 )
 button_clear = tk.Button(
     root, text="limpar tudo", padx=3, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=clear_all
+    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=lambda: clear_all
 
 )
 
@@ -389,7 +415,7 @@ for data in my_tree2.get_children():
     my_tree2.delete(data)
 
 # counter = 0  # Initialize a counter variable
-for result in reverse(read()):
+for result in reverse(read("ingredients")):
     my_tree2.insert(parent='', index='end', iid=result[0],
                     text="", values=(result), tag='orow')
     # counter += 1  # Increment the counter for the next iteration
@@ -397,6 +423,7 @@ for result in reverse(read()):
 # Agora, crie a lista de opções para a combobox
 options = [my_tree2.item(item, 'values')[1]
            for item in my_tree2.get_children()]
+print(options)
 
 # Variável para armazenar a opção selecionada
 selected_option = tk.StringVar()
@@ -408,12 +435,12 @@ combo = ttk.Combobox(frame1, textvariable=selected_option,
 # combo.set("Escolha um ingrediente")  # Valor padrão exibido na combobox
 
 
-def on_select():
+def on_select(event=None):
     print("selecionou")
 
 
 # Adicionar um evento para quando uma opção é selecionada
-combo.bind("<<ComboboxSelected>>", on_select())
+combo.bind("<<ComboboxSelected>>", lambda event=None: on_select())
 
 # Label para exibir a opção selecionada
 label_result = tk.Label(root, text="Selecionado: Nenhum",
@@ -479,9 +506,38 @@ my_tree1.heading("Nome", text="Nome", anchor="center")
 my_tree1.heading("Preco", text="Preço", anchor="center")
 my_tree1.heading("Composicao", text="Composição", anchor="center")
 
+# Configurar cabeçalhos clicáveis
+col_types = {'ID': 'int', 'Nome': 'str',
+             'Preço': 'float', 'Data de Validade': 'datetime'}
+for col in my_tree1['columns']:
+    text = my_tree1.heading(col, "text")
+    my_tree1.heading(col, text=text, command=lambda c=col: sort_treeview_column(
+        my_tree1, c, col_types.get(c, 'str'), False))
+
+"""
+for col in my_tree1['columns']:
+    text = my_tree1.heading(col, "text")
+    my_tree1.heading(
+        col, text=text, command=lambda c=col: sort_treeview_column(my_tree1, c, False))
+"""
+
+# print("1")
+# print(my_tree1.get_children())
+for data in my_tree1.get_children():
+    # print("2")
+    my_tree1.delete(data)
+    # print("apagou")
+
+# counter = 0  # Initialize a counter variable
+for result in reverse(read("drinks")):
+    my_tree1.insert(parent='', index='end', iid=result[0],
+                    text="", values=(result), tag='orow')
+    # counter += 1  # Increment the counter for the next iteration
+
 my_tree1.tag_configure('orow', background="#EEEEEE",
                        font=('Inconsolata', tamanho_fonte))
 my_tree1.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
+
 
 my_tree2['columns'] = ("ID", "Nome", "Volume", "Data de Validade")
 my_tree2.column("#0", width=0, stretch=False)
@@ -519,7 +575,7 @@ for data in my_tree2.get_children():
     # print("apagou")
 
 # counter = 0  # Initialize a counter variable
-for result in reverse(read()):
+for result in reverse(read("ingredients")):
     my_tree2.insert(parent='', index='end', iid=result[0],
                     text="", values=(result), tag='orow')
     # counter += 1  # Increment the counter for the next iteration
