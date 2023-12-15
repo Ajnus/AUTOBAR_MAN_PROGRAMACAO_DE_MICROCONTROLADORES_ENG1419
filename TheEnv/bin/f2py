@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/home/ajna/Documentos/PUC-Rio/ENG1419 - Programação de MicroControladores/ENG1419_PROGRAMACAO_DE_MICROCONTROLADORES/Projeto_Final_Auto_Barman/TheEnv/bin/python3" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from numpy.f2py.f2py2e import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
