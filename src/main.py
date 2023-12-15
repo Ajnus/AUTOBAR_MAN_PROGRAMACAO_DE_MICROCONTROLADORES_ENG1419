@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime
 from PIL import Image, ImageTk
 from unidecode import unidecode
+from serial import Serial
 
 tamanho_fonte = 7
 
@@ -281,8 +282,14 @@ def delete_data(table, combo):
 def update_data(table):
     if table == "ingredients":
         tree = my_tree2
+        entrada1 = entry_ingredient_name
+        entrada2 = entry_volume
+        entrada3 = entry_expiration_date.get()
     if table == "drinks":
         tree = my_tree1
+        entrada1 = entry_drink_name
+        entrada2 = entry_price
+        entrada3 = composition
 
     # print(tree.selection())
     # print(tree.selection()[0])
@@ -290,8 +297,8 @@ def update_data(table):
     # print(selected_item)
 
     update_name = str(tree.item(selected_item)['values'][0])
-    update(table, update_name, entry_ingredient_name.get(), entry_volume.get(),
-           entry_expiration_date.get(), update_name)
+    update(table, update_name, entrada1.get(), entrada2.get(),
+           entrada3, update_name)
 
     for data in tree.get_children():
         tree.delete(data)
