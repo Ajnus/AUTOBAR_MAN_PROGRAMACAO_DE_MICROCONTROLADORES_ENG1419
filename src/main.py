@@ -1,12 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-import ast
 import sqlite3
 from datetime import datetime
 from PIL import Image, ImageTk
 from unidecode import unidecode
-from serial import Serial
+from integracao import serial_load
+from integracao import serial_send
+
 
 tamanho_fonte = 7
 
@@ -202,7 +203,7 @@ def insert_data(table, combo):
     if table == "ingredients":
         entry_expiration_date.delete(0, 'end')
         update_combobox(combo, table)
-    
+
     if table == "drinks":
         clear_all()
 
@@ -477,6 +478,14 @@ button_clear = tk.Button(
 
 )
 
+button_download = tk.Button(
+    root, text="Desce uma!🍺", padx=20, pady=15, width=7, bd=3,
+    # command=lambda: insert_data("drinks", combo)
+    font=('Inconsolata', tamanho_fonte, 'bold'),
+    bg="#AE4EAF",
+    fg="white", command=lambda: serial_send()
+)
+
 
 # Antes de criar a lista options, certifique-se de preencher a tabela my_tree2 com dados
 for data in my_tree2.get_children():
@@ -508,6 +517,8 @@ def on_select(event=None):
     combo.set(combo.get())
 
 # TO DO: não Funciona
+
+
 def on_focus_out(event=None):
     print("ON_FOCUS_EVENT")
     combo.selection_clear()
@@ -560,8 +571,8 @@ button_delete2.place(x=386+490+30, y=660)
 
 button_add.place(x=384-178, y=427)
 button_clear.place(x=384-79, y=427)
-# button_add2.place(x=384-177, y=635)
-# button_clear2.place(x=384-78, y=635)
+button_download.place(x=876, y=225)
+
 
 combinacoes_label.place(x=80, y=473)
 
@@ -661,6 +672,7 @@ my_tree2.tag_configure('orow', background="#EEEEEE",
                        font=('Inconsolata', tamanho_fonte))
 my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
+serial_load()
 
 root.mainloop()
 

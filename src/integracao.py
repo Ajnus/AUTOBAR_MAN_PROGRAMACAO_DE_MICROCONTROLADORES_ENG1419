@@ -1,9 +1,18 @@
 from serial import Serial
 from threading import Thread, Timer
 from time import sleep
-from traceback import format_exc
+#from traceback import format_exc
 from unidecode import unidecode
 
+PORTA = "/dev/ttyACM0"        # alterar dependendo de onde vai rodar
+# sudo chmod a+rw /dev/ttyACM0
+
+
+# CASO A SERIAL NÃO FUNCIONE, COMENTE A LINHA ABAIXO E DESCOMENTE A SEGUINTE
+meu_serial = Serial(PORTA, baudrate=115200, timeout=0.1)
+# meu_serial = None
+
+texto = "ENVIADO DO PYTHON: DRINK(ID PREÇO PP1 PP2 PP3 PP4 NOME)\n"
 
 def serial():
     while True:
@@ -17,22 +26,20 @@ def serial():
         sleep(0.1)
 
 
-# CASO A SERIAL NÃO FUNCIONE, COMENTE A LINHA ABAIXO E DESCOMENTE A SEGUINTE
+def serial_load():
+    thread = Thread(target=serial)
+    thread.daemon = True
+    thread.start()
+    print("[INFO] Serial: ok")
 
-#meu_serial = Serial("/dev/ttyACM0", baudrate=115200, timeout=0.1)
-meu_serial = None
 
-texto = "ENVIADO DO PYTHON: OLÁ THERE\n"
+def serial_send():
 
-print("[INFO] Serial: ok")
+        # COLOQUE AQUI O CÓDIGO DO WHILE DA IMPLEMENTACAO
+        # print("ESCRITO DO PYTHON: TESTE")
+        meu_serial.write(texto.encode("UTF-8"))
+        #sleep(1)
 
-thread = Thread(target=serial)
-thread.daemon = True
-thread.start()
 
-while True:
-
-    # COLOQUE AQUI O CÓDIGO DO WHILE DA IMPLEMENTACAO
-    #print("ESCRITO DO PYTHON: TESTE")
-    meu_serial.write(texto.encode("UTF-8"))
-    sleep(1)
+#serial_load()
+#serial_send()
