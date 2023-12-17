@@ -501,7 +501,7 @@ button_download = tk.Button(
     # command=lambda: insert_data("drinks", combo)
     font=('Inconsolata', tamanho_fonte, 'bold'),
     bg="#AE4EAF",
-    fg="white", command=lambda: serial_send()
+    fg="white", command=lambda: serial_send(resultado+"\n")
 )
 
 
@@ -518,7 +518,7 @@ for result in reverse(read("ingredients")):
 # Agora, crie a lista de opções para a combobox
 options = [my_tree2.item(item, 'values')[1]
            for item in my_tree2.get_children()]
-print(options)
+# print(f"OPTIONS: {options}")
 
 # Variável para armazenar a opção selecionada
 selected_option = tk.StringVar()
@@ -692,6 +692,25 @@ my_tree2.tag_configure('orow', background="#EEEEEE",
 my_tree2.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
 serial_load()
+
+# print(read("drinks"))
+drinks = read("drinks")
+
+# Inicializa a variável de texto
+resultado = ""
+
+# Percorre a lista de drinks
+for drink in drinks:
+    # Extrai as informações relevantes
+    drink_id, nome, preco, _ = drink
+
+    # Formata a string e adiciona ao resultado
+    resultado += f"{drink_id} {preco} {nome}\n"
+
+# Exibe o resultado
+print(f"RESULTADO: {resultado}")
+
+# texto = "ID PREÇO PP1 PP2 PP3 PP4 NOME)"
 
 root.mainloop()
 

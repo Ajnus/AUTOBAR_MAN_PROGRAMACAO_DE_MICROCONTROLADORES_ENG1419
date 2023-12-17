@@ -12,8 +12,6 @@ PORTA = "/dev/ttyACM0"        # alterar dependendo de onde vai rodar
 meu_serial = Serial(PORTA, baudrate=115200, timeout=0.1)
 # meu_serial = None
 
-texto = "ENVIADO DO PYTHON: DRINK(ID PREÇO PP1 PP2 PP3 PP4 NOME)\n"
-
 def serial():
     while True:
         if meu_serial != None:
@@ -33,7 +31,7 @@ def serial_load():
     print("[INFO] Serial: ok")
 
 
-def serial_send():
+def serial_send(texto):
 
         # COLOQUE AQUI O CÓDIGO DO WHILE DA IMPLEMENTACAO
         # print("ESCRITO DO PYTHON: TESTE")
