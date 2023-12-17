@@ -702,13 +702,22 @@ resultado = ""
 # Percorre a lista de drinks
 for drink in drinks:
     # Extrai as informações relevantes
-    drink_id, nome, preco, _ = drink
-
+    drink_id, nome, preco, composicao_str = drink
+    
+    # Converte a string de composição para um dicionário
+    composicao = eval(composicao_str)
+    
+    # Extrai os valores das chaves específicas ou usa 0 se a chave não existir
+    valor_campari = composicao.get('Campari', 0)
+    valor_limonada = composicao.get('Limonada', 0)
+    valor_pinga_azul = composicao.get('Pinga Azul', 0)
+    valor_cachaca = composicao.get('Cachaça', 0)
+    
     # Formata a string e adiciona ao resultado
-    resultado += f"{drink_id} {preco} {nome}\n"
+    resultado += f"{drink_id} {preco} {valor_campari} {valor_limonada} {valor_pinga_azul} {valor_cachaca} {nome}\n"
 
 # Exibe o resultado
-print(f"RESULTADO: {resultado}")
+#print(resultado)
 
 # texto = "ID PREÇO PP1 PP2 PP3 PP4 NOME)"
 
