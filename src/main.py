@@ -27,11 +27,11 @@ with Image.open("assets/images/sort.png") as sort:
     sort_image = ImageTk.PhotoImage(sort)
 
 frame1 = tk.Frame(root, width='350', height='1850', bg='#333333')
-frame1.place(x=80, y=280)
+frame1.place(x=20, y=280)
 my_tree1 = ttk.Treeview(frame1, height=6)
 
 frame2 = tk.Frame(root, width='350', height='1850', bg='#333333')
-frame2.place(x=45, y=510)
+frame2.place(x=2, y=510)
 my_tree2 = ttk.Treeview(frame2, height=6)
 
 
@@ -48,15 +48,17 @@ def insert(table, id, name, attr3, attr4):
 
     if table == "ingredients":
         column3 = "itemVolume"
+        config3 = "INTEGER"
         column4 = "itemExpirationDate"
+        config4 = "DATETIME"
     elif table == "drinks":
         column3 = "itemPrice"
+        config3 = "FLOAT"
         column4 = "itemComposition"
+        config4 = "TEXT"
 
-        cursor.execute(f"""
-            CREATE TABLE IF NOT EXISTS
-            {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)
-        """)
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS
+                   {table}(itemId INTEGER, itemName TEXT, {column3} {config3}, {column4} {config4})""")
     cursor.execute(f"INSERT INTO {table} VALUES(?, ?, ?, ?)",
                    (id, name, attr3, attr4))
     conn.commit()
@@ -68,13 +70,17 @@ def delete(table, data):
 
     if table == "ingredients":
         column3 = "itemVolume"
+        config3 = "INTEGER"
         column4 = "itemExpirationDate"
+        config4 = "DATETIME"
     elif table == "drinks":
         column3 = "itemPrice"
+        config3 = "FLOAT"
         column4 = "itemComposition"
+        config4 = "TEXT"
 
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
+                   {table}(itemId INTEGER, itemName TEXT, {column3} {config3}, {column4} {config4})""")
     cursor.execute(f"DELETE FROM {table} WHERE itemId = ?", (int(data),))
     conn.commit()
 
@@ -85,13 +91,17 @@ def update(table, id, name, attr3, attr4, idName):
 
     if table == "ingredients":
         column3 = "itemVolume"
+        config3 = "INTEGER"
         column4 = "itemExpirationDate"
+        config4 = "DATETIME"
     elif table == "drinks":
         column3 = "itemPrice"
+        config3 = "FLOAT"
         column4 = "itemComposition"
+        config4 = "TEXT"
 
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
+                   {table}(itemId INTEGER, itemName TEXT, {column3} {config3}, {column4} {config4})""")
     cursor.execute(f"UPDATE {table} SET itemId = ?, itemName = ?, {column3} = ?, {column4} = ? WHERE itemId = ?",
                    (int(id), name, attr3, attr4, int(idName)))
 
@@ -104,13 +114,17 @@ def read(table):
 
     if table == "ingredients":
         column3 = "itemVolume"
+        config3 = "INTEGER"
         column4 = "itemExpirationDate"
+        config4 = "DATETIME"
     elif table == "drinks":
         column3 = "itemPrice"
+        config3 = "FLOAT"
         column4 = "itemComposition"
+        config4 = "TEXT"
 
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS
-                   {table}(itemId TEXT, itemName TEXT, {column3} TEXT, {column4} TEXT)""")
+                   {table}(itemId INTEGER, itemName TEXT, {column3} {config3}, {column4} {config4})""")
     cursor.execute(f"SELECT * FROM {table}")
 
     results = cursor.fetchall()
@@ -210,6 +224,7 @@ def insert_data(table, combo):
 
 def delete_data(table, combo):
     global options
+    global composition
     # print(f"DELETE_DATA: {options}")
     if table == "ingredients":
         tree = my_tree2
@@ -314,6 +329,8 @@ def update_data(table):
                        font=('Inconsolata', tamanho_fonte))
     tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
+    composition = {}
+
 # reordena coluna
 
 
@@ -378,7 +395,7 @@ composition = {}
 def add_composition():
     print("CHAMOU ADD_COMPOSITION")
     global composition
-    print("COMPOSIÇÃO: {composition}")
+    print(f"COMPOSIÇÃO: {composition}")
     selected_ingredient = combo.get()
     selected_quantity = entry_quantities.get()
 
@@ -417,27 +434,27 @@ ingredients_label = tk.Label(frame1, text="Ingredientes", font=(
 quantities_label = tk.Label(frame1, text="Quantidades (ml)", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
-id_label = tk.Label(frame2, text="Nome", font=(
+ingredient_name_label = tk.Label(frame2, text="Nome", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
-ingredient_name_label = tk.Label(frame2, text="Volume Disponível (ml)", font=(
+volume_label = tk.Label(frame2, text="Vol Disponível (ml)", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 expiration_date_label = tk.Label(frame2, text="Data de Validade", font=(
     "Inconsolata", tamanho_fonte), bd=2, relief="solid", bg='#FFFFFF')
 
-entry_drink_name = tk.Entry(frame1, width=25, bd=5,
+entry_drink_name = tk.Entry(frame1, width=22, bd=5,
                             font=("Inconsolata", tamanho_fonte))
-entry_price = tk.Entry(frame1, width=25, bd=5,
+entry_price = tk.Entry(frame1, width=22, bd=5,
                        font=("Inconsolata", tamanho_fonte))
-entry_ingredients = tk.Entry(frame1, width=25, bd=5,
+entry_ingredients = tk.Entry(frame1, width=22, bd=5,
                              font=("Inconsolata", tamanho_fonte))
-entry_quantities = tk.Entry(frame1, width=25, bd=5,
+entry_quantities = tk.Entry(frame1, width=22, bd=5,
                             font=("Inconsolata", tamanho_fonte))
 
-entry_ingredient_name = tk.Entry(frame2, width=25, bd=5,
+entry_ingredient_name = tk.Entry(frame2, width=22, bd=5,
                                  font=("Inconsolata", tamanho_fonte))
-entry_volume = tk.Entry(frame2, width=25, bd=5,
+entry_volume = tk.Entry(frame2, width=22, bd=5,
                         font=("Inconsolata", tamanho_fonte))
-entry_expiration_date = tk.Entry(frame2, width=25, bd=5,
+entry_expiration_date = tk.Entry(frame2, width=22, bd=5,
                                  font=("Inconsolata", tamanho_fonte))
 
 # mock
@@ -469,12 +486,12 @@ button_delete2 = tk.Button(
     font=('Inconsolata', tamanho_fonte), bg="#E62E00", command=lambda: delete_data("ingredients", combo)
 )
 button_add = tk.Button(
-    root, text="adicionar", padx=4, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#00FF41", command=add_composition
+    root, text="adicionar", padx=3, pady=3, width=10, bd=3,
+    font=('Inconsolata', tamanho_fonte-2), bg="#00FF41", command=add_composition
 )
 button_clear = tk.Button(
     root, text="limpar tudo", padx=3, pady=3, width=10, bd=3,
-    font=('Inconsolata', tamanho_fonte-1), bg="#FF9900", command=clear_all
+    font=('Inconsolata', tamanho_fonte-2), bg="#FF9900", command=clear_all
 
 )
 
@@ -507,7 +524,7 @@ selected_option = tk.StringVar()
 
 # Criar a combobox
 combo = ttk.Combobox(frame1, textvariable=selected_option,
-                     values=options, width=18, state="readonly")
+                     values=options, width=16, state="readonly")
 # combo.pack(pady=10)
 # combo.set("Escolha um ingrediente")  # Valor padrão exibido na combobox
 
@@ -548,8 +565,8 @@ price_label.grid(row=1, column=0, padx=10, pady=10)
 ingredients_label.grid(row=2, column=0, padx=10, pady=10)
 quantities_label.grid(row=3, column=0, padx=10, pady=10)
 
-id_label.grid(row=0, column=0, padx=10, pady=10)
-ingredient_name_label.grid(row=1, column=0, padx=10, pady=10)
+ingredient_name_label.grid(row=0, column=0, padx=10, pady=10)
+volume_label.grid(row=1, column=0, padx=10, pady=10)
 expiration_date_label.grid(row=2, column=0, padx=10, pady=10)
 
 entry_drink_name.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
@@ -561,17 +578,17 @@ entry_ingredient_name.grid(row=0, column=1, columnspan=3, padx=5, pady=5)
 entry_volume.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
 entry_expiration_date.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
 
-button_enter1.place(x=386, y=433)
-button_update1.place(x=386+245+30, y=433)
-button_delete1.place(x=386+490+30, y=433)
+button_enter1.place(x=386-78, y=433)
+button_update1.place(x=680, y=433)
+button_delete1.place(x=386+610+30-38, y=433)
 
-button_enter2.place(x=386, y=660)
-button_update2.place(x=386+245+30, y=660)
-button_delete2.place(x=386+490+30, y=660)
+button_enter2.place(x=386-78, y=660)
+button_update2.place(x=680, y=660)
+button_delete2.place(x=386+610+30-38, y=660)
 
-button_add.place(x=384-178, y=427)
-button_clear.place(x=384-79, y=427)
-button_download.place(x=876, y=225)
+button_add.place(x=384-178-59, y=427)
+button_clear.place(x=384-79-68, y=427)
+button_download.place(x=958, y=225)
 
 
 combinacoes_label.place(x=80, y=473)
@@ -585,14 +602,15 @@ style.configure("Treeview.Heading", font=('Inconsolata', 10))
 
 my_tree1['columns'] = ("ID", "Nome", "Preco", "Composicao")
 my_tree1.column("#0", width=0, stretch=False)
-my_tree1.column("ID", anchor="w", width=100)
-my_tree1.column("Nome", anchor="w", width=150)
-my_tree1.column("Preco", anchor="w", width=180)
-my_tree1.column("Composicao", anchor="w", width=150)
+my_tree1.column("ID", anchor="w", width=40)
+my_tree1.column("Nome", anchor="w", width=200)
+my_tree1.column("Preco", anchor="w", width=60)
+my_tree1.column("Composicao", anchor="w", width=440)
 my_tree1.heading("ID", text="ID", image=sort_image, anchor="center")
 my_tree1.heading("Nome", text="Nome", anchor="center")
 my_tree1.heading("Preco", text="Preço", anchor="center")
-my_tree1.heading("Composicao", text="Composição", anchor="center")
+my_tree1.heading(
+    "Composicao", text="Composição (dose de 100 ml)", anchor="center")
 
 # Configurar cabeçalhos clicáveis
 col_types = {'ID': 'int', 'Nome': 'str',
@@ -629,10 +647,10 @@ my_tree1.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
 
 my_tree2['columns'] = ("ID", "Nome", "Volume", "Data de Validade")
 my_tree2.column("#0", width=0, stretch=False)
-my_tree2.column("ID", anchor="w", width=100)
-my_tree2.column("Nome", anchor="w", width=150)
-my_tree2.column("Volume", anchor="w", width=180)
-my_tree2.column("Data de Validade", anchor="w", width=150)
+my_tree2.column("ID", anchor="w", width=40)
+my_tree2.column("Nome", anchor="w", width=200)
+my_tree2.column("Volume", anchor="w", width=200)
+my_tree2.column("Data de Validade", anchor="w", width=300)
 # my_tree2.heading('#0', text="ID", image = sort_image, anchor="center")
 my_tree2.heading("ID", text="ID", image=sort_image, anchor="center",
                  command=lambda: sort_treeview_column(my_tree2, '#0', 'ID', False))
