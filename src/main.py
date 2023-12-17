@@ -144,6 +144,8 @@ def update_combobox(combo, table):
 
 
 def insert_data(table, combo):
+    global composition
+
     if table == "ingredients":
         tree = my_tree2
         entrada1 = entry_ingredient_name
@@ -221,10 +223,11 @@ def insert_data(table, combo):
     if table == "drinks":
         clear_all()
 
+    composition.clear()
+
 
 def delete_data(table, combo):
-    global options
-    global composition
+
     # print(f"DELETE_DATA: {options}")
     if table == "ingredients":
         tree = my_tree2
@@ -247,8 +250,8 @@ def delete_data(table, combo):
             # Remover o item selecionado da Combobox
             ingredient_name = tree.item(selected_item)['values'][1]
             # print(f"INGREDIENT NAME: {ingredient_name}")
-            # print(options)
             global options
+            # print(options)
             options.remove(ingredient_name)
             combo["values"] = options
 
@@ -328,8 +331,6 @@ def update_data(table):
     tree.tag_configure('orow', background="#EEEEEE",
                        font=('Inconsolata', tamanho_fonte))
     tree.grid(row=0, column=5, columnspan=4, rowspan=5, padx=10, pady=1)
-
-    composition = {}
 
 # reordena coluna
 
@@ -579,11 +580,11 @@ entry_volume.grid(row=1, column=1, columnspan=3, padx=5, pady=5)
 entry_expiration_date.grid(row=2, column=1, columnspan=3, padx=5, pady=5)
 
 button_enter1.place(x=386-78, y=433)
-button_update1.place(x=680, y=433)
+button_update1.place(x=645, y=433)
 button_delete1.place(x=386+610+30-38, y=433)
 
 button_enter2.place(x=386-78, y=660)
-button_update2.place(x=680, y=660)
+button_update2.place(x=645, y=660)
 button_delete2.place(x=386+610+30-38, y=660)
 
 button_add.place(x=384-178-59, y=427)

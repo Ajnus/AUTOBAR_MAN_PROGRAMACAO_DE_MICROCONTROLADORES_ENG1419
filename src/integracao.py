@@ -4,7 +4,7 @@ from time import sleep
 #from traceback import format_exc
 from unidecode import unidecode
 
-PORTA = "/dev/ttyACM1"        # alterar dependendo de onde vai rodar
+PORTA = "/dev/ttyACM0"        # alterar dependendo de onde vai rodar
 # sudo chmod a+rw /dev/ttyACM0 ou # sudo chmod a+rw /dev/ttyACM1
 
 
