@@ -13,7 +13,7 @@ tamanho_fonte = 7
 
 
 root = tk.Tk()
-root.title("Auto Barman")
+root.title("AutoBar, man")
 root.geometry("1080x720")
 root.configure(bg='#333333')
 root.resizable(False, False)
@@ -703,21 +703,21 @@ resultado = ""
 for drink in drinks:
     # Extrai as informações relevantes
     drink_id, nome, preco, composicao_str = drink
-    
+
     # Converte a string de composição para um dicionário
     composicao = eval(composicao_str)
-    
+
     # Extrai os valores das chaves específicas ou usa 0 se a chave não existir
     valor_campari = composicao.get('Campari', 0)
     valor_limonada = composicao.get('Limonada', 0)
     valor_pinga_azul = composicao.get('Pinga Azul', 0)
     valor_cachaca = composicao.get('Cachaça', 0)
-    
+
     # Formata a string e adiciona ao resultado
-    resultado += f"{drink_id} {preco} {valor_campari} {valor_limonada} {valor_pinga_azul} {valor_cachaca} {nome}\n"
+    resultado += f"{drink_id} {preco} {valor_campari} {valor_limonada} {valor_pinga_azul} {valor_cachaca} {unidecode(nome)}\n"
 
 # Exibe o resultado
-#print(resultado)
+# print(resultado)
 
 # texto = "ID PREÇO PP1 PP2 PP3 PP4 NOME)"
 
