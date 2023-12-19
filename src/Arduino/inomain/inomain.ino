@@ -603,12 +603,12 @@ void loop()
         {
             Serial.println(texto);
             Serial.println("");
-            //imprimirLista();
+            imprimirLista();
             enviaPraEEPROM();
 
             le();
             Serial.println("\nLISTA PÓS-EEPROM\n");
-            //imprimirLista();
+            imprimirLista();
         }
         else if (texto != "INICIOU" && texto != "FINALIZOU")
         {

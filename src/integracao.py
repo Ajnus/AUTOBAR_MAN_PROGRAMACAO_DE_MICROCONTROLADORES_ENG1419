@@ -4,7 +4,7 @@ from time import sleep
 # from traceback import format_exc
 from unidecode import unidecode
 
-PORTA = "/dev/ttyACM0"        # alterar dependendo de onde vai rodar
+PORTA = "/dev/ttyUSB0"        # alterar dependendo de onde vai rodar
 # sudo chmod a+rw /dev/ttyACM0 ou # sudo chmod a+rw /dev/ttyACM1 sudo chmod a+rw /dev/ttyUSB0
 
 # CASO A SERIAL NÃO FUNCIONE, COMENTE A LINHA ABAIXO E DESCOMENTE A SEGUINTE
